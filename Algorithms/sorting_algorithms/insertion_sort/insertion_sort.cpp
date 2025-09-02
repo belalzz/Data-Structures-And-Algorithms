@@ -10,6 +10,11 @@
     if its greater than the key so the it shift right
     and the last step is by assigning the value of the key
     in which no greater than key in prv sub-array
+    -----
+    to sort in Decreasing order
+    The only difference is to check
+    shift elements to right while values
+    smaller than the key
 */
 #include <iostream>
 #include <vector>
@@ -17,11 +22,24 @@
 using namespace std;
 
 void insertion_sort(vector<int>& A){
-    int n = A.size();
+    size_t n = A.size();
     for (int i = 1; i < n; ++i){
         int key = A[i];
         int j = i - 1;
         while (j >= 0 && A[j] > key){
+            A[j + 1] = A[j];
+            j--;
+        }
+        A[j + 1] = key;
+    }
+}
+
+void rev_insertion_sort(vector<int>& A){
+    size_t n = A.size();
+    for (int i = 1; i < n; ++i){
+        int key = A[i];
+        int j = i - 1;
+        while (j >= 0 && A[j] < key){
             A[j + 1] = A[j];
             j--;
         }
@@ -34,6 +52,9 @@ int main(){
     vector<int> A(n);
     for (int i = 0; i < n; ++i) cin >> A[i];
     insertion_sort(A);
+    for(int x: A) cout << x << ' ';
+    cout << '\n';
+    rev_insertion_sort(A);
     for(int x: A) cout << x << ' ';
     return 0;
 }
