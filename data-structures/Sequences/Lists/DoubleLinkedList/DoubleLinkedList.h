@@ -77,19 +77,11 @@ DoubleLinkedList<T>::~DoubleLinkedList(){
 template <typename T>
 T DoubleLinkedList<T>::get_at(int idx) {
     assert((idx >= 0 && idx < length) && "Invalid index");
+    if(length == 1) return head->val;
     if(idx == 0) return head->val;
     if(idx == length - 1) return tail->val;
-
     Node<T>* it = head;
-    if (length - idx > idx) {
-        for (int i = 0; i < idx; ++i) {
-            it = it->next;
-        }
-    } else {
-        for (int i = 0; i < length - idx - 1; ++i) {
-            it = it->prev;
-        }
-    }
+    for (int i = 0; i < idx; ++i) it = it->next;
     return it->val;
 }
 
@@ -112,33 +104,19 @@ int DoubleLinkedList<T>::len() const {
 
 template <typename T>
 void DoubleLinkedList<T>::insert_first(T x) {
-    if(is_empty()) {
-        Node<T>* new_node = new Node<T>(x);
-        head = new_node;
-        tail = new_node;
-        length = 1;
-        return;
-    }
     Node<T>* new_node = new Node<T>(x, nullptr, head);
     if(head) head->prev = new_node;
+    else tail = new_node;
     head = new_node;
-    if(!tail) tail = head;
     length++;
 }
 
 template <typename T>
 void DoubleLinkedList<T>::insert_last(T x) {
-    if(is_empty()) {
-        Node<T>* new_node = new Node<T>(x);
-        head = new_node;
-        tail = new_node;
-        length = 1;
-        return;
-    }
     Node<T>* new_node = new Node<T>(x, tail, nullptr);
     if(tail) tail->next = new_node;
+    else head = new_node;
     tail = new_node;
-    if(!head) head = tail;
     length++;
 }
 
@@ -153,21 +131,12 @@ void DoubleLinkedList<T>::insert_at(int idx, T x) {
         insert_last(x);
         return;
     }
-    Node<T>* it = head;
-    if (length - idx > idx) {
-        for (int i = 0; i < idx; ++i) {
-            it = it->next;
-        }
-    } else {
-        for (int i = 0; i < length - idx; ++i) {
-            it = it->prev;
-        }
-    }
-    Node<T>* next_node = it;
-    Node<T>* prev_node = it->prev;
-    Node<T>* new_node = new Node<T>(x, prev_node, next_node);
-    if(prev_node) prev_node->next = new_node;
-    next_node->prev = new_node;
+    Node<T>* prv = head;
+    for (int i = 0; i < idx - 1; ++i) prv = prv->next;
+    Node<T>* nxt = prv->next;
+    Node<T>* new_node = new Node<T>(x, prv, nxt);
+    prv->next = new_node;
+    nxt->prev = new_node;
     length++;
 }
 
@@ -188,15 +157,7 @@ void DoubleLinkedList<T>::set_at(int idx, T x) {
         return;
     }
     Node<T>* it = head;
-    if (length - idx > idx) {
-        for (int i = 0; i < idx; ++i) {
-            it = it->next;
-        }
-    } else {
-        for (int i = 0; i < length - idx - 1; ++i) {
-            it = it->prev;
-        }
-    }
+    for (int i = 0; i < idx; ++i) it = it->next;
     it->val = x;
 }
 
@@ -212,25 +173,15 @@ void DoubleLinkedList<T>::delete_at(int idx) {
         return;
     }
     Node<T>* it = head;
-    if (length - idx > idx) {
-        for (int i = 0; i < idx; ++i) {
-            it = it->next;
-        }
-    } else {
-        for (int i = 0; i < length - idx; ++i) {
-            it = it->prev;
-        }
+    for (int i = 0; i < idx; ++i) {
+        it = it->next;
     }
-    Node<T>* del = it;
-    Node<T>* prev_node = del->prev;
-    Node<T>* next_node = del->next;
-    if(prev_node) prev_node->next = next_node;
-    else head = next_node;
-    if(next_node) next_node->prev = prev_node;
-    else tail = prev_node;
-    delete del;
+    Node<T>* prv = it->prev;
+    Node<T>* nxt = it->next;
+    if(prv) prv->next = nxt;
+    if(nxt) nxt->prev = prv;
+    delete it;
     length--;
-
 }
 
 template <typename T>
